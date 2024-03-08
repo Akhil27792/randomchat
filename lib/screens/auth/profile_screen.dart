@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:js_interop';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,138 +25,163 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late List<ChatUser> list = [];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Random Chat',
-          textAlign: TextAlign.center,
+    final _formKey = GlobalKey<FormState>();
+    return GestureDetector(
+      //for hiding keyboard when click on screeen anywhere
+      onTap: () => FocusScope.of(context).unfocus,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Random Chat',
+            textAlign: TextAlign.center,
+          ),
         ),
-      ),
-      // floating button to Log Out user
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: FloatingActionButton.extended(
-          backgroundColor: Colors.redAccent,
-          onPressed: () async {
-            //for showing progress dialog
-            Dialogs.showProgessBar(context);
+        // floating button to Log Out user
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: FloatingActionButton.extended(
+            backgroundColor: Colors.redAccent,
+            onPressed: () async {
+              //for showing progress dialog
+              Dialogs.showProgessBar(context);
 
-            //for sign out  from google and random chat api
-            await API.auth.signOut().then((value) async {
-              await GoogleSignIn().signOut().then((value) {
-                //for hiding progress bar
-                Navigator.pop(context);
-                //for moving to home screen
-                Navigator.pop(context);
-                //replacing home screen with login screen
-                Navigator.pushReplacementNamed(
-                    context,
-                    //why string is getting??
-                    MaterialPageRoute(builder: (context) => const LoginScreen())
-                        as String);
+              //for sign out  from google and random chat api
+              await API.auth.signOut().then((value) async {
+                await GoogleSignIn().signOut().then((value) {
+                  //for hiding progress bar
+                  Navigator.pop(context);
+                  //for moving to home screen
+                  Navigator.pop(context);
+                  //replacing home screen with login screen
+                  Navigator.pushReplacementNamed(
+                      context,
+                      //why string is getting??
+                      MaterialPageRoute(
+                          builder: (context) => const LoginScreen()) as String);
+                });
               });
-            });
-          },
-          icon: const Icon(Icons.logout_outlined),
-          label: const Text('Log Out'),
+            },
+            icon: const Icon(Icons.logout_outlined),
+            label: const Text('Log Out'),
+          ),
         ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: mq.width * .05),
-        child: Column(
-          children: [
-            SizedBox(
-              width: mq.width,
-              height: mq.height * .03,
-            ),
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(mq.height * 1),
-                  child: CachedNetworkImage(
-                    width: mq.height * .2,
-                    height: mq.height * .2,
-                    imageUrl: widget.user.image,
-                    errorWidget: (context, url, error) => const CircleAvatar(
-                      child: Icon(CupertinoIcons.person),
+        body: Form(
+          key: _formKey,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: mq.width * .05),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: mq.width,
+                    height: mq.height * .03,
+                  ),
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(mq.height * 1),
+                        child: CachedNetworkImage(
+                          width: mq.height * .2,
+                          height: mq.height * .2,
+                          imageUrl: widget.user.image,
+                          errorWidget: (context, url, error) =>
+                              const CircleAvatar(
+                            child: Icon(CupertinoIcons.person),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: MaterialButton(
+                          elevation: 1,
+                          onPressed: () {},
+                          shape: const CircleBorder(),
+                          color: Colors.white,
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.blue,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: mq.height * .03,
+                  ),
+                  Text(
+                    widget.user.email,
+                    style: const TextStyle(color: Colors.black54, fontSize: 20),
+                  ),
+                  SizedBox(
+                    height: mq.height * .05,
+                  ),
+                  TextFormField(
+                    initialValue: widget.user.name,
+                    onSaved: (val) => API.me.name = val ?? '',
+                    validator: (val) =>
+                        val != null && val.isNotEmpty ? null : 'Required Field',
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      prefixIcon: const Icon(
+                        Icons.person_2_rounded,
+                        color: Colors.blueAccent,
+                      ),
+                      hintText: ('eg: Happy Singh'),
+                      label: const Text('Name'),
                     ),
                   ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: MaterialButton(
-                    elevation: 1,
-                    onPressed: () {},
-                    shape: const CircleBorder(),
-                    color: Colors.white,
-                    child: const Icon(
+                  SizedBox(
+                    height: mq.height * .03,
+                  ),
+                  TextFormField(
+                    initialValue: widget.user.about,
+                    onSaved: (val) => API.me.about = val ?? '',
+                    validator: (val) =>
+                        val != null && val.isNotEmpty ? null : 'Required Field',
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      prefixIcon: const Icon(
+                        Icons.info_outline,
+                        color: Colors.blueAccent,
+                      ),
+                      hintText: ('eg: Happy Singh'),
+                      label: const Text('About'),
+                    ),
+                  ),
+                  SizedBox(
+                    height: mq.height * .05,
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        _formKey.currentState!.save();
+                        API.updateUserInfo().then((value) {
+                          Dialogs.showSnackbar(
+                              context, "Profile Updated Successfully");
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                        shape: const StadiumBorder(),
+                        minimumSize: Size(mq.width * .5, mq.height * .06)),
+                    icon: const Icon(
                       Icons.edit,
-                      color: Colors.blue,
+                      size: 28,
+                      color: Colors.black,
+                    ),
+                    label: const Text(
+                      'UPDATE',
+                      style: TextStyle(
+                          color: Colors.black, fontWeight: FontWeight.bold),
                     ),
                   ),
-                )
-              ],
-            ),
-            SizedBox(
-              height: mq.height * .03,
-            ),
-            Text(
-              widget.user.email,
-              style: const TextStyle(color: Colors.black54, fontSize: 20),
-            ),
-            SizedBox(
-              height: mq.height * .05,
-            ),
-            TextFormField(
-              initialValue: widget.user.name,
-              decoration: InputDecoration(
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                prefixIcon: const Icon(
-                  Icons.person_2_rounded,
-                  color: Colors.blueAccent,
-                ),
-                hintText: ('eg: Happy Singh'),
-                label: const Text('Name'),
+                ],
               ),
             ),
-            SizedBox(
-              height: mq.height * .03,
-            ),
-            TextFormField(
-              initialValue: widget.user.about,
-              decoration: InputDecoration(
-                border:
-                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                prefixIcon: const Icon(
-                  Icons.info_outline,
-                  color: Colors.blueAccent,
-                ),
-                hintText: ('eg: Happy Singh'),
-                label: const Text('About'),
-              ),
-            ),
-            SizedBox(
-              height: mq.height * .05,
-            ),
-            ElevatedButton.icon(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                  shape: const StadiumBorder(),
-                  minimumSize: Size(mq.width * .5, mq.height * .06)),
-              icon: const Icon(
-                Icons.edit,
-                size: 28,
-                color: Colors.black,
-              ),
-              label: const Text(
-                'UPDATE',
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
