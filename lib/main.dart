@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:random_chat/screens/auth/home_screen.dart';
 import 'package:random_chat/screens/auth/splash_screen.dart';
 import 'firebase_options.dart';
 
@@ -8,10 +9,13 @@ late Size mq;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp,DeviceOrientation.portraitDown]).then((value) {_initializeFirebase();runApp(const MyApp());}  
-  );
+  SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
+      .then((value) {
+    _initializeFirebase();
+    runApp(const MyApp());
+  });
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
- 
 }
 
 class MyApp extends StatelessWidget {
@@ -34,12 +38,14 @@ class MyApp extends StatelessWidget {
               ),
               backgroundColor: Colors.white,
             ),
-            floatingActionButtonTheme: const FloatingActionButtonThemeData(backgroundColor: Colors.black)),
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+                backgroundColor: Colors.black)),
         home: const SplashScreen());
   }
 }
+
 _initializeFirebase() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
 }
