@@ -28,95 +28,117 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: _isSearching
-            ? TextField(
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: "Search By Name",
-                ),
-                style: const TextStyle(fontSize: 16, letterSpacing: 0.5),
-                //when search text changes then updated search list
-                onChanged: (value) {
-                  //search logic
-                  _searchList.clear();
-                  for (var i in _list) {
-                    if (i.name.toLowerCase().contains(value.toLowerCase())) {
-                      _searchList.add(i);
-                    }
-                    setState(() {
-                      _searchList;
-                    });
-                  }
-                },
-                autofocus: true,
-              )
-            : const Text('Random Chat'),
-        leading: const Icon(CupertinoIcons.home),
-        actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.camera_alt)),
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _isSearching = !_isSearching;
-              });
-            },
-            icon: Icon(_isSearching
-                ? CupertinoIcons.clear_circled_solid
-                : Icons.search),
-          ),
-          IconButton(
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ProfileScreen(
-                              user: API.me,
-                            )));
-              },
-              icon: const Icon(Icons.more_vert))
-        ],
-      ),
-      //floating button to add new user
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 8.0),
-        child: FloatingActionButton(
-          onPressed: () {},
-          child: const Icon(Icons.add_comment_rounded),
-        ),
-      ),
-      body: StreamBuilder(
-        stream: API.getAllUser(),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-            case ConnectionState.none:
-            case ConnectionState.active:
-            case ConnectionState.done:
-              final data = snapshot.data?.docs;
-              _list =
-                  data?.map((e) => ChatUser.fromJson(e.data())).toList() ?? [];
-          }
-          if (_list.isNotEmpty) {
-            return ListView.builder(
-                itemCount: _isSearching ? _searchList.length : _list.length,
-                padding: EdgeInsets.only(top: mq.height * .01),
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (context, index) {
-                  // return const ChatUserCard();
-                  return ChatUserCard(
-                    user: _isSearching ? _searchList[index] : _list[index],
-                  );
-                });
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: WillPopScope(
+        onWillPop: () {
+          //if search is on & back button is pressed then close search
+          //or else simple close current screen on back buttonclick
+          if (_isSearching) {
+            setState(() {
+              _isSearching = !_isSearching;
+            });
+            return Future.value(false); //don't pop the screen
           } else {
-            return const Center(
-                child: Text(
-              "No Friends Found",
-              style: TextStyle(fontSize: 20),
-            ));
+            return Future.value(true); //pop the screen
           }
         },
+        child: Scaffold(
+          appBar: AppBar(
+            title: _isSearching
+                ? TextField(
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Search By Name",
+                    ),
+                    style: const TextStyle(fontSize: 16, letterSpacing: 0.5),
+                    //when search text changes then updated search list
+                    onChanged: (value) {
+                      //search logic
+                      _searchList.clear();
+                      for (var i in _list) {
+                        if (i.name
+                            .toLowerCase()
+                            .contains(value.toLowerCase())) {
+                          _searchList.add(i);
+                        }
+                        setState(() {
+                          _searchList;
+                        });
+                      }
+                    },
+                    autofocus: true,
+                  )
+                : const Text('Random Chat'),
+            leading: const Icon(CupertinoIcons.home),
+            actions: [
+              IconButton(onPressed: () {}, icon: const Icon(Icons.camera_alt)),
+              IconButton(
+                onPressed: () {
+                  setState(() {
+                    _isSearching = !_isSearching;
+                  });
+                },
+                icon: Icon(_isSearching
+                    ? CupertinoIcons.clear_circled_solid
+                    : Icons.search),
+              ),
+              IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileScreen(
+                                  user: API.me,
+                                )));
+                  },
+                  icon: const Icon(Icons.more_vert))
+            ],
+          ),
+          //floating button to add new user
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: FloatingActionButton(
+              onPressed: () {},
+              child: const Icon(Icons.add_comment_rounded),
+            ),
+          ),
+          body: StreamBuilder(
+            stream: API.getAllUser(),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                //if data is loading
+                case ConnectionState.waiting:
+                case ConnectionState.none:
+                //if some or all data is loaded then show it
+                case ConnectionState.active:
+                case ConnectionState.done:
+                  final data = snapshot.data?.docs;
+                  _list =
+                      data?.map((e) => ChatUser.fromJson(e.data())).toList() ??
+                          [];
+              }
+              if (_list.isNotEmpty) {
+                return ListView.builder(
+                    itemCount: _isSearching ? _searchList.length : _list.length,
+                    padding: EdgeInsets.only(top: mq.height * .01),
+                    physics: const BouncingScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      // return const ChatUserCard();
+                      return ChatUserCard(
+                        user: _isSearching ? _searchList[index] : _list[index],
+                      );
+                    });
+              } else {
+                return const Center(
+                    child: Text(
+                  "No Friends Found",
+                  style: TextStyle(fontSize: 20),
+                ));
+              }
+            },
+          ),
+        ),
       ),
     );
   }
