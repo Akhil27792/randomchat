@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -72,5 +73,26 @@ class API {
         .collection('users')
         .doc(auth.currentUser?.uid)
         .update({'name': me.name, 'about': me.about});
+  }
+
+//for updating profile picture of user
+  static Future<void> updateProfilePicture(File file) async {
+    //getting image extension
+    final ext = file.path.split('.').last;
+    log('Extension: $ext' as num);
+    //storage file ref with path
+    final ref = storage.ref().child('profile_pictures/${user.uid}.$ext');
+    //uploading image
+    await ref
+        .putFile(file, SettableMetadata(contentType: 'images/$ext'))
+        .then((p0) {
+      log('Data transferred: ${p0.bytesTransferred / 1000}kb ' as num);
+    });
+    //updating image in firebase database
+    me.image = await ref.getDownloadURL();
+    await firestore
+        .collection('users')
+        .doc(user.uid)
+        .update({'image': me.image});
   }
 }
