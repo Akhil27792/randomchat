@@ -1,11 +1,14 @@
-import 'dart:developer';
-import 'dart:js_interop';
+// ignore_for_file: use_build_context_synchronously
 
+import 'dart:developer';
+// import 'dart:ffi';
+import 'dart:io';
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:random_chat/api/api.dart';
 import 'package:random_chat/helper/dialogs.dart';
 import 'package:random_chat/models/chat_user.dart';
@@ -23,9 +26,11 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late List<ChatUser> list = [];
+  String? _image;
   @override
   Widget build(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
+
     return GestureDetector(
       //for hiding keyboard when click on screeen anywhere
       onTap: () => FocusScope.of(context).unfocus,
@@ -78,18 +83,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Stack(
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(mq.height * 1),
-                        child: CachedNetworkImage(
-                          width: mq.height * .2,
-                          height: mq.height * .2,
-                          imageUrl: widget.user.image,
-                          errorWidget: (context, url, error) =>
-                              const CircleAvatar(
-                            child: Icon(CupertinoIcons.person),
-                          ),
-                        ),
-                      ),
+                      _image != null
+                          ? ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(mq.height * 1),
+                              child: Image.file(
+                                File(_image!),
+                                width: mq.height * .2,
+                                height: mq.height * .2,
+                                fit: BoxFit.cover,
+                              ),
+                            )
+                          : ClipRRect(
+                              borderRadius:
+                                  BorderRadius.circular(mq.height * 1),
+                              child: CachedNetworkImage(
+                                width: mq.height * .2,
+                                height: mq.height * .2,
+                                imageUrl: widget.user.image,
+                                fit: BoxFit.cover,
+                                errorWidget: (context, url, error) =>
+                                    const CircleAvatar(
+                                  child: Icon(CupertinoIcons.person),
+                                ),
+                              ),
+                            ),
                       Positioned(
                         bottom: 0,
                         right: 0,
@@ -167,8 +185,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                        shape: const StadiumBorder(),
-                        minimumSize: Size(mq.width * .5, mq.height * .06)),
+                      shape: const StadiumBorder(),
+                      // minimumSize: Size(mq.width * .5, mq.height * .06)
+                    ),
                     icon: const Icon(
                       Icons.edit,
                       size: 28,
@@ -213,14 +232,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final ImagePicker picker = ImagePicker();
+                        // Pick an image.
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.gallery);
+                        if (image != null) {
+                          log('Image Path: ${image.path} -- MimeType: ${image.mimeType}');
+                          setState(() {
+                            _image = image.path;
+                          });
+                          //for removing bottom sheet
+                          Navigator.pop(context);
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                           shape: const CircleBorder(),
                           backgroundColor: Colors.white,
                           fixedSize: Size(mq.width * .3, mq.height * .15)),
                       child: Image.asset('images/add_image.png')),
                   ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        final ImagePicker picker = ImagePicker();
+                        // Pick an image.
+                        final XFile? image =
+                            await picker.pickImage(source: ImageSource.camera);
+                        if (image != null) {
+                          log('Image Path: ${image.path}');
+                          setState(() {
+                            _image = image.path;
+                          });
+                          //for removing bottom sheet
+                          Navigator.pop(context);
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                           shape: const CircleBorder(),
                           backgroundColor: Colors.white,
