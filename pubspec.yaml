@@ -47,7 +47,7 @@ dependencies:
   cached_network_image: ^3.3.1
   #for image picking
   image_picker: ^1.0.7
-  #for accessing firebase storage(like photo vidio etc)
+  #for accessing firebase storage(like photo video etc)
   firebase_storage: ^11.6.0
 
 dev_dependencies:

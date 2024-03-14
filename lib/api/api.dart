@@ -67,7 +67,7 @@ class API {
         .snapshots();
   }
 
-//for updating profile info
+//for updating user information
   static Future<void> updateUserInfo() async {
     await firestore
         .collection('users')
@@ -75,7 +75,7 @@ class API {
         .update({'name': me.name, 'about': me.about});
   }
 
-//for updating profile picture of user
+//updating profile picture of user
   static Future<void> updateProfilePicture(File file) async {
     //getting image extension
     final ext = file.path.split('.').last;
