@@ -6,7 +6,6 @@ import 'package:random_chat/screens/auth/splash_screen.dart';
 import 'firebase_options.dart';
 
 late Size mq;
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
