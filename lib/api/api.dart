@@ -71,7 +71,7 @@ class API {
   static Future<void> updateUserInfo() async {
     await firestore
         .collection('users')
-        .doc(auth.currentUser?.uid)
+        .doc(user.uid)
         .update({'name': me.name, 'about': me.about});
   }
 
