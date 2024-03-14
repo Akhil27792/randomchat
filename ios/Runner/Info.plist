@@ -61,5 +61,9 @@
 		</array>
 	</dict>
 </array>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>This app needs access to your photos so we can provide you with the best possible service.</string>
+		<key>NSCameraUsageDescription</key>
+		<string>App requires access to the camera for taking picture</string>
 </dict>
 </plist>
