@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
               top: mq.height * .85,
               right: mq.width * .21,
               child: const Text(
-                'Made by Krishna And Akhil ',
+                'Made by Krishna And Akhil',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 16, color: Colors.lightBlueAccent),
               )),

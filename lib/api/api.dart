@@ -20,7 +20,7 @@ class API {
   static Future<bool> userExist() async {
     return (await firestore
             .collection('users')
-            .doc(auth.currentUser?.uid)
+            .doc(user.uid)
             .get())
         .exists;
   }
@@ -28,14 +28,14 @@ class API {
   static Future<void> getSelfInfo() async {
     await firestore
         .collection('users')
-        .doc(auth.currentUser?.uid)
+        .doc(user.uid)
         .get()
-        .then((user) {
+        .then((user) async {
       if (user.exists) {
-        me = ChatUser.fromJson(user.data() as Map<String, dynamic>);
-        log('My Data: ${user.data()}' as num);
+        me = ChatUser.fromJson(user.data()!);
+        log('My Data: ${user.data()}' as num  );
       } else {
-        createUser().then((value) => getSelfInfo());
+       await createUser().then((value) => getSelfInfo());
       }
     });
   }
@@ -71,7 +71,7 @@ class API {
   static Future<void> updateUserInfo() async {
     await firestore
         .collection('users')
-        .doc(auth.currentUser?.uid)
+        .doc(user.uid)
         .update({'name': me.name, 'about': me.about});
   }
 
@@ -79,7 +79,7 @@ class API {
   static Future<void> updateProfilePicture(File file) async {
     //getting image extension
     final ext = file.path.split('.').last;
-    log('Extension: $ext' as num);
+    // log('Extension: $ext' as num );
     //storage file ref with path
     final ref = storage.ref().child('profile_pictures/${user.uid}.$ext');
     //uploading image

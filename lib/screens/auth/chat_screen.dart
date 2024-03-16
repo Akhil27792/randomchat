@@ -31,7 +31,7 @@ child: Row(
       children: [
         IconButton(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.arrow_back,
               color: Colors.black54,
             )),
@@ -55,7 +55,7 @@ child: Row(
           children: [
             Text(
               widget.user.name,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
                   fontWeight: FontWeight.w500)),
