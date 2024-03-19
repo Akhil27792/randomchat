@@ -23,7 +23,50 @@ class _ChatscreenState extends State<Chatscreen> {
             AppBar(automaticallyImplyLeading: false, flexibleSpace: _appBar()),
         //body
         body: Column(
-          children: [_chatInput()],
+          children: [
+            Expanded(
+              child: StreamBuilder(
+              // stream: API.getAllUser(),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  //if data is loading
+                  case ConnectionState.waiting:
+                  case ConnectionState.none:
+                 // return const Center(child: CircularProgressIndicator(),);
+                  //if some or all data is loaded then show it
+                  case ConnectionState.active:
+                  case ConnectionState.done:
+                    // final data = snapshot.data?.docs;
+                    // _list =
+                    //     data?.map((e) => ChatUser.fromJson(e.data())).toList() ??
+                    //         [];
+                
+                   final _list = [];
+                
+                if (_list.isNotEmpty) {
+                  return ListView.builder(
+                        itemCount:_list.length,
+                      padding: EdgeInsets.only(top: mq.height * .01),
+                      physics: const BouncingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        // return const ChatUserCard();
+                        return Text('Message: ${_list[index]}');
+                });
+                } else {
+                  return const Center(
+                    
+                      child: Text(
+                    "Say Hii!👋🏻",
+                    style: TextStyle(fontSize: 20),
+                       )
+                     );
+                  }
+                }
+              }
+                      ),
+            ),
+            _chatInput()
+          ],
         ),
       ),
     );
