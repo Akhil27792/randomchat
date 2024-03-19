@@ -28,7 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _image;
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
+    final formKey = GlobalKey<FormState>();
 
     return GestureDetector(
       //for hiding keyboard when click on screeen anywhere
@@ -70,7 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         body: Form(
-          key: _formKey,
+          key: formKey,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: mq.width * .05),
             child: SingleChildScrollView(
@@ -119,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           color: Colors.white,
                           child: const Icon(
                             Icons.edit,
-                            color: Colors.blue,
+                            color: Color.fromARGB(255, 9, 116, 203),
                           ),
                         ),
                       )
@@ -175,8 +175,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _formKey.currentState!.save();
+                      if (formKey.currentState!.validate()) {
+                        formKey.currentState!.save();
                         API.updateUserInfo().then((value) {
                           Dialogs.showSnackbar(
                               context, "Profile Updated Successfully");
@@ -241,7 +241,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           setState(() {
                             _image = image.path;
                           });
-                          API.updateProfilePicture(File(_image!));
+                          API.updateProfilePicture(File(image as String));
                           //for removing bottom sheet
                           Navigator.pop(context);
                         }

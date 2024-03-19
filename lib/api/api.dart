@@ -33,7 +33,7 @@ class API {
         .then((user) async {
       if (user.exists) {
         me = ChatUser.fromJson(user.data()!);
-        log('My Data: ${user.data()}' as num  );
+        log('My Data: ${user.data()}' as num );
       } else {
        await createUser().then((value) => getSelfInfo());
       }
